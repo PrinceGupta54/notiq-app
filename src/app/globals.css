@@ -1,0 +1,416 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-inter: 'Inter', system-ui, sans-serif;
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 64px;
+}
+
+/* Light mode tokens */
+:root {
+  --bg-base: #f8f9fa;
+  --bg-surface: #ffffff;
+  --bg-elevated: #ffffff;
+  --border-color: #e5e7eb;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+  --sidebar-bg: #ffffff;
+  --sidebar-border: #e5e7eb;
+  --sidebar-item-hover: #f3f4f6;
+  --sidebar-item-active: #faf5ff;
+  --sidebar-item-active-text: #7c3aed;
+}
+
+/* Dark mode tokens */
+.dark {
+  --bg-base: #0f0f0f;
+  --bg-surface: #1a1a1a;
+  --bg-elevated: #242424;
+  --border-color: #2e2e2e;
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+  --text-tertiary: #6b7280;
+  --sidebar-bg: #141414;
+  --sidebar-border: #2e2e2e;
+  --sidebar-item-hover: #1f1f1f;
+  --sidebar-item-active: #1e1028;
+  --sidebar-item-active-text: #a855f7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-inter);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* Focus ring */
+*:focus-visible {
+  outline: 2px solid #7c3aed;
+  outline-offset: 2px;
+}
+
+/* Selection */
+::selection {
+  background: #e9d5ff;
+  color: #581c87;
+}
+
+.dark ::selection {
+  background: #4c1d95;
+  color: #e9d5ff;
+}
+
+/* ============================================
+   NOTIQ DARK DESIGN SYSTEM
+   Paste this at the VERY BOTTOM of your
+   existing src/app/globals.css file
+   ============================================ */
+
+/* ── Global dark background ── */
+html,
+body {
+  background-color: #08080f !important;
+  color: #f0f0ff;
+  min-height: 100vh;
+}
+
+/* ── Smooth font rendering ── */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
+}
+
+/* ── Custom scrollbar ── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(124, 58, 237, 0.35) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.35);
+  border-radius: 2px;
+}
+
+/* ── Sidebar nav items ── */
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  transition: all 0.15s ease;
+  text-decoration: none;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+}
+
+.sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.9);
+  border-left-color: transparent;
+}
+
+.sidebar-item.active {
+  background: rgba(124, 58, 237, 0.2);
+  color: #c4b5fd;
+  border-left-color: #7c3aed;
+}
+
+.sidebar-logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.3);
+  transition: all 0.15s ease;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+}
+
+.sidebar-logout:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+}
+
+/* ── Dark overrides for existing pages inside AppShell ──
+   These automatically make ALL existing pages look dark
+   without changing any code in those pages              */
+.app-content .bg-white {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+.app-content .bg-gray-50 {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+.app-content .bg-gray-100 {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.app-content .bg-gray-200 {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.app-content .border-gray-100 {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.app-content .border-gray-200 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.app-content .border-gray-300 {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.app-content .text-gray-900,
+.app-content .text-gray-800 {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+.app-content .text-gray-700 {
+  color: rgba(255, 255, 255, 0.72) !important;
+}
+
+.app-content .text-gray-600 {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+.app-content .text-gray-500 {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.app-content .text-gray-400 {
+  color: rgba(255, 255, 255, 0.28) !important;
+}
+
+.app-content .text-gray-300 {
+  color: rgba(255, 255, 255, 0.22) !important;
+}
+
+.app-content input:not([type="checkbox"]):not([type="radio"]),
+.app-content textarea,
+.app-content select {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  color-scheme: dark;
+}
+
+.app-content input::placeholder,
+.app-content textarea::placeholder {
+  color: rgba(255, 255, 255, 0.22) !important;
+}
+
+.app-content input:focus,
+.app-content textarea:focus,
+.app-content select:focus {
+  border-color: rgba(124, 58, 237, 0.55) !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12) !important;
+  outline: none !important;
+}
+
+.app-content select option {
+  background: #0f0f1a;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Hover states */
+.app-content .hover\:bg-gray-50:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.app-content .hover\:bg-gray-100:hover {
+  background-color: rgba(255, 255, 255, 0.07) !important;
+}
+
+/* Purple stays purple */
+.app-content .bg-purple-600 {
+  background-color: #7c3aed !important;
+}
+
+.app-content .hover\:bg-purple-700:hover {
+  background-color: #6d28d9 !important;
+}
+
+.app-content .bg-purple-50 {
+  background-color: rgba(124, 58, 237, 0.15) !important;
+}
+
+.app-content .text-purple-600,
+.app-content .text-purple-700 {
+  color: #c4b5fd !important;
+}
+
+.app-content .border-purple-200,
+.app-content .border-purple-300 {
+  border-color: rgba(124, 58, 237, 0.35) !important;
+}
+
+.app-content .hover\:border-purple-300:hover {
+  border-color: rgba(124, 58, 237, 0.5) !important;
+}
+
+/* Badge colors */
+.app-content .text-green-600,
+.app-content .text-green-700 {
+  color: #86efac !important;
+}
+
+.app-content .text-red-600,
+.app-content .text-red-700 {
+  color: #fda4af !important;
+}
+
+.app-content .text-red-500 {
+  color: #f87171 !important;
+}
+
+.app-content .text-amber-600,
+.app-content .text-amber-700 {
+  color: #fcd34d !important;
+}
+
+.app-content .text-blue-700 {
+  color: #67e8f9 !important;
+}
+
+.app-content .text-cyan-600 {
+  color: #67e8f9 !important;
+}
+
+.app-content .bg-green-50 {
+  background-color: rgba(134, 239, 172, 0.08) !important;
+}
+
+.app-content .bg-red-50 {
+  background-color: rgba(253, 164, 175, 0.08) !important;
+}
+
+.app-content .bg-amber-50 {
+  background-color: rgba(252, 211, 77, 0.08) !important;
+}
+
+.app-content .bg-blue-50 {
+  background-color: rgba(103, 232, 249, 0.08) !important;
+}
+
+.app-content .bg-teal-50,
+.app-content .bg-cyan-50 {
+  background-color: rgba(103, 232, 249, 0.08) !important;
+}
+
+.app-content .border-green-200 {
+  border-color: rgba(134, 239, 172, 0.25) !important;
+}
+
+.app-content .border-red-200 {
+  border-color: rgba(253, 164, 175, 0.25) !important;
+}
+
+.app-content .border-amber-200 {
+  border-color: rgba(252, 211, 77, 0.25) !important;
+}
+
+.app-content .border-blue-200 {
+  border-color: rgba(103, 232, 249, 0.25) !important;
+}
+
+/* File input button */
+.app-content input[type="file"]::file-selector-button {
+  background: rgba(124, 58, 237, 0.2) !important;
+  color: #c4b5fd !important;
+  border: 1px solid rgba(124, 58, 237, 0.3) !important;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* Animate-pulse skeleton dark */
+.app-content .animate-pulse .bg-gray-200 {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Shadow override */
+.app-content .shadow-sm {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Checkbox accent */
+.app-content input[type="checkbox"] {
+  accent-color: #7c3aed !important;
+  background-color: transparent !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Line-through color for done items */
+.app-content .line-through {
+  text-decoration: line-through;
+}
+
+/* Rounded-xl dark card */
+.app-content .rounded-xl,
+.app-content .rounded-2xl {
+  /* keep border-radius, just ensure bg shows through overrides */
+}
+
+/* Tab selected bg */
+.app-content .bg-white.shadow-sm {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
