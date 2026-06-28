@@ -1,7 +1,7 @@
 // src/app/login/page.js
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
@@ -17,6 +17,21 @@ export default function LoginPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [focused,       setFocused]       = useState(null);
   const [shake,         setShake]         = useState(false);
+
+  // ── Session check: redirect to dashboard if already logged in ──
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) router.push("/dashboard");
+    };
+    checkSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) router.push("/dashboard");
+    });
+
+    return () => subscription.unsubscribe();
+  }, [router]);
 
   const triggerShake = () => {
     setShake(true);
