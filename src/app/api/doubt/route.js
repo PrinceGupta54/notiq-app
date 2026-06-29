@@ -25,7 +25,7 @@ ${subject ? `Current subject context: ${subject}` : "Help with any academic subj
         "X-Title": "Notiq Doubt Chat",
       },
       body: JSON.stringify({
-        model: "meta-llama/llama-3.1-8b-instruct:free",
+        model: "meta-llama/llama-3.1-8b-instruct",
         messages: [
           { role: "system", content: systemPrompt },
           ...messages,
