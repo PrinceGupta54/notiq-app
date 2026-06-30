@@ -1,4 +1,6 @@
 // src/app/exam-hub/[id]/page.js
+// REPLACE your entire existing exam-hub/[id]/page.js with this
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -6,214 +8,65 @@ import { useRouter, useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import AppShell from "@/components/AppShell";
-import { ExternalLink, ChevronRight } from "lucide-react";
+import { ExternalLink } from "lucide-react";
+import { examContent } from "@/lib/examContent";
 
-// ── Ambient orbs ─────────────────────────────────────────────
-function AmbientOrbs({ color }) {
-  const c = color || "#818cf8";
-  return (
-    <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
-      <div style={{
-        position: "absolute", top: "-20%", left: "-10%",
-        width: 600, height: 600, borderRadius: "50%",
-        background: `radial-gradient(circle, ${c}18 0%, transparent 65%)`,
-        filter: "blur(80px)",
-        animation: "orbA 14s ease-in-out infinite",
-      }} />
-      <div style={{
-        position: "absolute", bottom: "-15%", right: "-8%",
-        width: 440, height: 440, borderRadius: "50%",
-        background: `radial-gradient(circle, ${c}0e 0%, transparent 70%)`,
-        filter: "blur(60px)",
-        animation: "orbB 17s ease-in-out infinite",
-      }} />
-      <style>{`
-        @keyframes orbA{0%,100%{transform:translate(0,0) scale(1)}40%{transform:translate(30px,40px) scale(1.06)}70%{transform:translate(-15px,-20px) scale(0.96)}}
-        @keyframes orbB{0%,100%{transform:translate(0,0)}45%{transform:translate(-25px,30px)}75%{transform:translate(15px,-15px)}}
-        @keyframes skPulse{0%,100%{opacity:1}50%{opacity:.4}}
-      `}</style>
-    </div>
-  );
-}
+const TABS = [
+  { key: "about",        label: "About" },
+  { key: "opportunities",label: "Opportunities" },
+  { key: "timeline",     label: "Timeline" },
+  { key: "eligibility",  label: "Eligibility" },
+  { key: "exam_pattern", label: "Exam Pattern" },
+  { key: "cutoffs",      label: "Cutoffs & Scores" },
+  { key: "application",  label: "Application" },
+  { key: "after_exam",   label: "After Exam" },
+  { key: "faqs",         label: "FAQs" },
+  { key: "disclaimer",   label: "Disclaimer" },
+];
 
-// ── Skeleton loader ──────────────────────────────────────────
-function Skeleton() {
-  return (
-    <div style={{ position: "relative", zIndex: 1, padding: "32px 24px", maxWidth: 760, margin: "0 auto" }}>
-      {/* Hero skeleton */}
-      <div style={{ display: "flex", gap: 18, marginBottom: 28, animation: "skPulse 1.6s ease-in-out infinite" }}>
-        <div style={{ width: 64, height: 64, borderRadius: 16, background: "rgba(255,255,255,0.07)", flexShrink: 0 }} />
-        <div style={{ flex: 1 }}>
-          <div style={{ height: 20, width: "40%", borderRadius: 6, background: "rgba(255,255,255,0.07)", marginBottom: 10 }} />
-          <div style={{ height: 13, width: "65%", borderRadius: 6, background: "rgba(255,255,255,0.05)" }} />
-        </div>
-      </div>
-      <div style={{ height: 46, borderRadius: 12, background: "rgba(255,255,255,0.05)", marginBottom: 28, animation: "skPulse 1.6s ease-in-out infinite" }} />
-      <div style={{ display: "flex", gap: 8, marginBottom: 28 }}>
-        {[100, 130, 110, 90, 120].map((w, i) => (
-          <div key={i} style={{ height: 32, width: w, borderRadius: 30, background: "rgba(255,255,255,0.05)", animation: "skPulse 1.6s ease-in-out infinite" }} />
-        ))}
-      </div>
-      <div style={{ height: 260, borderRadius: 18, background: "rgba(255,255,255,0.04)", animation: "skPulse 1.6s ease-in-out infinite" }} />
-    </div>
-  );
-}
+function ExamLogo({ exam }) {
+  const [failed, setFailed] = useState(false);
+  const initials = exam.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
-// ── Tab pill ─────────────────────────────────────────────────
-function TabPill({ tab, index, isActive, color, onClick }) {
-  const [hovered, setHovered] = useState(false);
-  const hex = color || "#818cf8";
-  const glow = hex + "40";
-  const bg   = hex + "18";
-  const bdr  = hex + "55";
-
-  return (
-    <motion.button
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.93 }}
-      onClick={onClick}
-      style={{
-        padding: "8px 18px", borderRadius: 30,
-        border: `1px solid ${isActive ? bdr : "rgba(255,255,255,0.09)"}`,
-        background: isActive ? bg : hovered ? "rgba(255,255,255,0.05)" : "rgba(255,255,255,0.03)",
-        color: isActive ? hex : "rgba(255,255,255,0.4)",
-        fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-        boxShadow: isActive ? `0 0 18px ${glow}` : "none",
-        transition: "all .22s",
-        display: "flex", alignItems: "center", gap: 6,
-        letterSpacing: "0.02em", whiteSpace: "nowrap",
-      }}
-    >
-      {isActive && (
-        <motion.span
-          layoutId="tabDot"
-          style={{
-            width: 6, height: 6, borderRadius: "50%",
-            background: hex, boxShadow: `0 0 7px ${hex}`,
-            display: "inline-block",
-          }}
-        />
-      )}
-      {tab.label}
-    </motion.button>
-  );
-}
-
-// ── Content panel ─────────────────────────────────────────────
-function ContentPanel({ tab, color }) {
-  if (!tab) return null;
-  const hex = color || "#818cf8";
-  const bg  = hex + "09";
-  const bdr = hex + "28";
-
-  // Try to detect structured content (lines starting with • or numbers)
-  const lines = (tab.content || "").split("\n").filter(Boolean);
-  const isList = lines.length > 2 && lines.some(l => /^[•\-\d]/.test(l.trim()));
-
+  if (!exam.icon || failed) {
+    return (
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+        style={{
+          width: 56, height: 56, borderRadius: 16, flexShrink: 0,
+          background: "rgba(124,58,237,.18)", border: "1px solid rgba(124,58,237,.35)",
+          boxShadow: "0 0 24px rgba(124,58,237,.25)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 19, fontWeight: 700, color: "#c4b5fd",
+        }}
+      >
+        {initials}
+      </motion.div>
+    );
+  }
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -12 }}
-      transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
       style={{
-        borderRadius: 20,
-        border: `1px solid ${bdr}`,
-        background: `linear-gradient(135deg, ${bg}, rgba(255,255,255,0.02))`,
-        overflow: "hidden",
-        boxShadow: `0 4px 40px ${hex}12`,
+        width: 56, height: 56, borderRadius: 16, flexShrink: 0,
+        background: "#fff", border: "1px solid rgba(255,255,255,.1)",
+        boxShadow: "0 0 24px rgba(124,58,237,.2)",
+        display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden",
       }}
     >
-      {/* Panel header bar */}
-      <div style={{
-        padding: "16px 24px",
-        borderBottom: `1px solid ${bdr}`,
-        display: "flex", alignItems: "center", gap: 10,
-        background: `linear-gradient(90deg, ${hex}10, transparent)`,
-      }}>
-        <div style={{
-          width: 8, height: 8, borderRadius: "50%",
-          background: hex, boxShadow: `0 0 10px ${hex}`,
-        }} />
-        <span style={{
-          fontSize: 12, fontWeight: 700, color: hex,
-          letterSpacing: "0.06em", textTransform: "uppercase",
-        }}>
-          {tab.label}
-        </span>
-      </div>
-
-      {/* Panel body */}
-      <div style={{ padding: "24px" }}>
-        {isList ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {lines.map((line, i) => {
-              const trimmed = line.trim();
-              const isBullet = /^[•\-]/.test(trimmed);
-              const isNum    = /^\d+[\.\)]/.test(trimmed);
-              const isHead   = !isBullet && !isNum && trimmed.endsWith(":") || trimmed === trimmed.toUpperCase();
-              const text     = trimmed.replace(/^[•\-\d]+[\.\)]?\s*/, "");
-
-              if (isHead) return (
-                <p key={i} style={{
-                  fontSize: 11, fontWeight: 700, color: hex,
-                  letterSpacing: "0.08em", textTransform: "uppercase",
-                  marginTop: i > 0 ? 8 : 0, marginBottom: 2,
-                }}>
-                  {trimmed}
-                </p>
-              );
-
-              return (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.03, duration: 0.25 }}
-                  style={{
-                    display: "flex", alignItems: "flex-start", gap: 12,
-                    padding: "10px 14px", borderRadius: 10,
-                    background: "rgba(255,255,255,0.03)",
-                    border: "1px solid rgba(255,255,255,0.06)",
-                  }}
-                >
-                  <span style={{
-                    flexShrink: 0, marginTop: 2,
-                    width: 6, height: 6, borderRadius: "50%",
-                    background: hex, boxShadow: `0 0 6px ${hex}`,
-                    opacity: 0.7,
-                  }} />
-                  <span style={{ fontSize: 13, color: "rgba(255,255,255,0.72)", lineHeight: 1.6 }}>
-                    {text || trimmed}
-                  </span>
-                </motion.div>
-              );
-            })}
-          </div>
-        ) : (
-          <p style={{
-            fontSize: 14, lineHeight: 1.85,
-            color: "rgba(255,255,255,0.65)",
-            whiteSpace: "pre-line",
-          }}>
-            {tab.content}
-          </p>
-        )}
-      </div>
+      <img src={exam.icon} alt={exam.name} onError={() => setFailed(true)}
+        style={{ width: "78%", height: "78%", objectFit: "contain" }} />
     </motion.div>
   );
 }
 
-// ── Main page ────────────────────────────────────────────────
 export default function ExamDetailPage() {
   const router = useRouter();
   const { id } = useParams();
   const [exam, setExam] = useState(null);
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState("about");
   const [loading, setLoading] = useState(true);
-  const [linkHovered, setLinkHovered] = useState(false);
+  const [portalHov, setPortalHov] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -226,150 +79,161 @@ export default function ExamDetailPage() {
     init();
   }, [id, router]);
 
-  const hex  = exam?.color || "#818cf8";
-  const glow = hex + "30";
-  const bg   = hex + "14";
-  const bdr  = hex + "45";
-  const tabs = exam?.tabs || [];
+  if (loading) {
+    return (
+      <AppShell>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
+          <div style={{
+            width: 40, height: 40, borderRadius: "50%",
+            border: "3px solid rgba(124,58,237,.25)", borderTopColor: "#7c3aed",
+            animation: "edSpin 1s linear infinite",
+          }} />
+        </div>
+        <style>{`@keyframes edSpin{to{transform:rotate(360deg)}}`}</style>
+      </AppShell>
+    );
+  }
 
-  if (loading) return (
-    <AppShell>
-      <AmbientOrbs color="#818cf8" />
-      <Skeleton />
-    </AppShell>
-  );
+  if (!exam) {
+    return (
+      <AppShell>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
+          <p style={{ color: "rgba(255,255,255,.35)" }}>Exam not found.</p>
+        </div>
+      </AppShell>
+    );
+  }
 
-  if (!exam) return (
-    <AppShell>
-      <div style={{ minHeight: "50vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 14 }}>Exam not found.</p>
-      </div>
-    </AppShell>
-  );
+  const content = examContent[exam.name] || {};
+  const tabContent = content[activeTab];
 
   return (
     <AppShell>
-      <AmbientOrbs color={hex} />
+      <style>{`
+        .ed-wrap { padding:32px 28px; max-width:760px; margin:0 auto; }
+        .ed-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+        @media (max-width:768px) {
+          .ed-wrap { padding:20px 14px; }
+        }
+      `}</style>
 
-      <div style={{ position: "relative", zIndex: 1, padding: "32px 24px 64px", maxWidth: 760, margin: "0 auto" }}>
+      <div className="ed-wrap">
 
-        {/* ── Hero card ── */}
-        <motion.div
-          initial={{ opacity: 0, y: -18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          style={{
-            display: "flex", alignItems: "center", gap: 20,
-            padding: "24px 26px", borderRadius: 20,
-            border: `1px solid ${bdr}`,
-            background: `linear-gradient(135deg, ${bg}, rgba(255,255,255,0.02))`,
-            boxShadow: `0 8px 40px ${glow}`,
-            marginBottom: 20,
-            position: "relative", overflow: "hidden",
-          }}
+        <motion.button
+          initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+          onClick={() => router.push("/exam-hub")}
+          whileHover={{ x: -3 }}
+          style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,.4)", fontSize: 13, marginBottom: 22, padding: 0, transition: "color .2s" }}
+          onMouseEnter={e => e.currentTarget.style.color = "#a78bfa"}
+          onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,.4)"}
         >
-          {/* Background radial */}
-          <div style={{
-            position: "absolute", top: -40, right: -40,
-            width: 200, height: 200, borderRadius: "50%",
-            background: `radial-gradient(circle, ${hex}20 0%, transparent 70%)`,
-            pointerEvents: "none",
-          }} />
+          ← Exam Hub
+        </motion.button>
 
-          {/* Icon */}
-          <motion.div
-            animate={{ rotate: [0, 5, -3, 0] }}
-            transition={{ duration: 4, repeat: Infinity, repeatDelay: 8 }}
-            style={{
-              flexShrink: 0, width: 64, height: 64, borderRadius: 16,
-              background: bg, border: `1px solid ${bdr}`,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 28,
-              boxShadow: `0 0 24px ${glow}`,
-            }}
-          >
-            {exam.icon}
-          </motion.div>
-
-          {/* Text */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{
-              fontSize: 11, fontWeight: 700, letterSpacing: "0.1em",
-              textTransform: "uppercase", color: hex, marginBottom: 6, opacity: 0.8,
-            }}>
-              {exam.category}
-            </p>
+        {/* ── Header ── */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.22,1,.36,1] }}
+          style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}
+        >
+          <ExamLogo exam={exam} />
+          <div>
             <h1 style={{
-              fontSize: 24, fontWeight: 800, lineHeight: 1.2,
-              color: "#fff", marginBottom: 4,
+              fontSize: 22, fontWeight: 800,
+              background: "linear-gradient(135deg,#fff 0%,#c4b5fd 60%,#818cf8 100%)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
             }}>
               {exam.name}
             </h1>
-            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
-              {exam.full_name}
-            </p>
+            <p style={{ fontSize: 12.5, color: "rgba(255,255,255,.4)" }}>{exam.full_name}</p>
           </div>
         </motion.div>
 
         {/* ── Official portal button ── */}
         {exam.official_url && (
           <motion.a
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            href={exam.official_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            onMouseEnter={() => setLinkHovered(true)}
-            onMouseLeave={() => setLinkHovered(false)}
+            href={exam.official_url} target="_blank" rel="noopener noreferrer"
+            whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.98 }}
+            onHoverStart={() => setPortalHov(true)}
+            onHoverEnd={() => setPortalHov(false)}
             style={{
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-              width: "100%", padding: "14px 20px", borderRadius: 14, marginBottom: 24,
-              border: `1px solid ${linkHovered ? bdr : "rgba(255,255,255,0.09)"}`,
-              background: linkHovered ? bg : "rgba(255,255,255,0.03)",
-              color: linkHovered ? hex : "rgba(255,255,255,0.55)",
-              fontSize: 13, fontWeight: 700, textDecoration: "none", fontFamily: "inherit",
-              boxShadow: linkHovered ? `0 0 28px ${glow}` : "none",
-              transition: "all .25s cubic-bezier(0.22,1,0.36,1)",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              width: "100%", padding: "13px", borderRadius: 13, marginBottom: 24,
+              background: "linear-gradient(135deg, rgba(124,58,237,.22), rgba(91,33,182,.12))",
+              border: `1px solid ${portalHov ? "rgba(124,58,237,.6)" : "rgba(124,58,237,.3)"}`,
+              color: "#c4b5fd", fontSize: 13.5, fontWeight: 700, textDecoration: "none",
+              boxShadow: portalHov ? "0 10px 30px rgba(124,58,237,.3)" : "0 0 20px rgba(124,58,237,.1)",
+              transition: "box-shadow .25s, border-color .25s",
             }}
           >
-            <ExternalLink size={15} />
             Open Official Portal
-            <motion.span
-              animate={{ x: linkHovered ? 4 : 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <ChevronRight size={14} />
-            </motion.span>
+            <ExternalLink size={14} style={{ transform: portalHov ? "translate(2px,-2px)" : "none", transition: "transform .2s" }} />
           </motion.a>
         )}
 
-        {/* ── Tab pills ── */}
-        {tabs.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20, overflowX: "auto", scrollbarWidth: "none" }}
-          >
-            {tabs.map((tab, i) => (
-              <TabPill
-                key={i}
-                tab={tab}
-                index={i}
-                isActive={activeTab === i}
-                color={hex}
-                onClick={() => setActiveTab(i)}
-              />
-            ))}
-          </motion.div>
-        )}
+        {/* ── Tabs ── */}
+        <motion.div
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
+          className="ed-tabs"
+        >
+          {TABS.map((tab, i) => (
+            <motion.button
+              key={tab.key}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.18 + i * 0.02 }}
+              whileHover={{ scale: 1.06, y: -1 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setActiveTab(tab.key)}
+              style={{
+                padding: "7px 14px", borderRadius: 20, fontSize: 11.5, fontWeight: 600,
+                cursor: "pointer", whiteSpace: "nowrap",
+                background: activeTab === tab.key ? "rgba(124,58,237,.25)" : "rgba(255,255,255,.04)",
+                border: `1px solid ${activeTab === tab.key ? "rgba(124,58,237,.5)" : "rgba(255,255,255,.08)"}`,
+                color: activeTab === tab.key ? "#c4b5fd" : "rgba(255,255,255,.45)",
+                boxShadow: activeTab === tab.key ? "0 0 16px rgba(124,58,237,.25)" : "none",
+                transition: "background .2s, border-color .2s, box-shadow .2s, color .2s",
+              }}
+            >
+              {tab.label}
+            </motion.button>
+          ))}
+        </motion.div>
 
-        {/* ── Content panel ── */}
+        {/* ── Content card ── */}
         <AnimatePresence mode="wait">
-          <ContentPanel key={activeTab} tab={tabs[activeTab]} color={hex} />
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 10, filter: "blur(3px)" }}
+            animate={{ opacity: 1, y: 0,  filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: -6,  filter: "blur(2px)" }}
+            transition={{ duration: 0.25, ease: [0.22,1,.36,1] }}
+            style={{
+              background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)",
+              borderRadius: 16, padding: "22px 24px",
+              boxShadow: "0 4px 24px rgba(0,0,0,.2)",
+              position: "relative", overflow: "hidden",
+            }}
+          >
+            <div style={{
+              position: "absolute", top: -30, right: -30, width: 100, height: 100, borderRadius: "50%",
+              background: "radial-gradient(circle, rgba(124,58,237,.08), transparent 70%)",
+              pointerEvents: "none",
+            }} />
+            <p style={{
+              fontSize: 13, fontWeight: 700, marginBottom: 12, position: "relative",
+              background: "linear-gradient(135deg,#c4b5fd,#818cf8)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+            }}>
+              {TABS.find(t => t.key === activeTab)?.label}
+            </p>
+            <p style={{ fontSize: 13.5, color: "rgba(255,255,255,.65)", lineHeight: 1.75, whiteSpace: "pre-line", position: "relative" }}>
+              {tabContent || "Content coming soon — check the official portal for the latest details."}
+            </p>
+          </motion.div>
         </AnimatePresence>
-
       </div>
     </AppShell>
   );
