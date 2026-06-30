@@ -14,7 +14,7 @@ import {
   MessageCircle, Trophy, FileText, BookOpen,
   Bell, Award, Building2, Plus, Trash2,
   TrendingUp, Zap, Target, ArrowUpRight, Layers,
-  ClipboardList, Palmtree, User, Pencil, Sparkles,
+  ClipboardList, Palmtree, User, Pencil, Sparkles, CalendarDays,
 } from "lucide-react";
 
 /* ─── helpers ─── */
@@ -89,6 +89,7 @@ const STUDY_TOOLS = [
   { label:"Attendance", href:"/attendance",  icon:CheckSquare,  color:"#a78bfa", glow:"124,58,237"  },
   { label:"SGPA Calc",  href:"/sgpa",        icon:Calculator,   color:"#67e8f9", glow:"103,232,249" },
   { label:"Pomodoro",   href:"/pomodoro",    icon:Timer,        color:"#f0abfc", glow:"240,171,252" },
+  { label:"Timetable",  href:"/timetable",   icon:CalendarDays, color:"#fda4af", glow:"253,164,175" },
 ];
 const LEARN = [
   { label:"Coursify",   href:"/coursify",   icon:PlayCircle,    color:"#86efac", glow:"134,239,172" },

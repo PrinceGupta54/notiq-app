@@ -15,6 +15,7 @@ import {
   BookOpen, Bell, ClipboardList, Award, Building2, LogOut,
   GraduationCap, X, User, Pencil,
   CalendarDays,
+  CalendarClock,
 } from "lucide-react";
 
 const NAV = [
@@ -30,6 +31,7 @@ const NAV = [
       { label: "Attendance", href: "/attendance", icon: CheckSquare },
       { label: "SGPA Calc",  href: "/sgpa",       icon: Calculator  },
       { label: "Pomodoro",   href: "/pomodoro",    icon: Timer       },
+      { label: "Timetable",   href: "/timetable",    icon: CalendarClock       },
     ],
   },
   {
