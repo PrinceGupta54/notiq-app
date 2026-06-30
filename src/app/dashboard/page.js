@@ -1,4 +1,3 @@
-
 // src/app/dashboard/page.js — FULLY RESPONSIVE VERSION
 // Paste this ENTIRE file into src/app/dashboard/page.js
 
@@ -15,7 +14,7 @@ import {
   MessageCircle, Trophy, FileText, BookOpen,
   Bell, Award, Building2, Plus, Trash2,
   TrendingUp, Zap, Target, ArrowUpRight, Layers,
-  ClipboardList,
+  ClipboardList, Palmtree,
 } from "lucide-react";
 
 /* ─── helpers ─── */
@@ -97,11 +96,12 @@ const LEARN = [
   { label:"Exam Hub",   href:"/exam-hub",   icon:Trophy,        color:"#fcd34d", glow:"252,211,77"  },
 ];
 const RESOURCES = [
-  { label:"Notes",    href:"/notes",    icon:FileText,      color:"#a78bfa", glow:"124,58,237"  },
-  { label:"E-Books",  href:"/ebooks",   icon:BookOpen,      color:"#67e8f9", glow:"103,232,249" },
-  { label:"Notices",  href:"/notices",  icon:Bell,          color:"#f0abfc", glow:"240,171,252" },
-  { label:"Syllabus", href:"/syllabus", icon:Layers,        color:"#c4b5fd", glow:"167,139,250" },
-  { label:"PYQ",      href:"/pyq",      icon:ClipboardList, color:"#86efac", glow:"134,239,172" },
+  { label:"Notes",     href:"/notes",     icon:FileText,      color:"#a78bfa", glow:"124,58,237"  },
+  { label:"E-Books",   href:"/ebooks",    icon:BookOpen,      color:"#67e8f9", glow:"103,232,249" },
+  { label:"Notices",   href:"/notices",   icon:Bell,          color:"#f0abfc", glow:"240,171,252" },
+  { label:"Syllabus",  href:"/syllabus",  icon:Layers,        color:"#c4b5fd", glow:"167,139,250" },
+  { label:"PYQ",       href:"/pyq",       icon:ClipboardList, color:"#86efac", glow:"134,239,172" },
+  { label:"Holidays",  href:"/holidays",  icon:Palmtree,      color:"#fb923c", glow:"251,146,60"  },
 ];
 const UNIVERSITY = [
   { label:"Results",      href:"/results",            icon:Award,     color:"#86efac", glow:"134,239,172" },
@@ -312,6 +312,7 @@ export default function DashboardPage() {
         .dash-tile-label { font-size:9.5px; }
         .dash-tiles-3  { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
         .dash-tiles-5  { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+        .dash-tiles-6  { display:grid; grid-template-columns:repeat(6,1fr); gap:10px; }
         .dash-tiles-2  { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
 
         /* ── Quick access box ── */
@@ -329,6 +330,7 @@ export default function DashboardPage() {
         @media (max-width:1024px) {
           .dash-stats-grid { grid-template-columns:repeat(2,1fr); gap:12px; }
           .dash-tiles-5    { grid-template-columns:repeat(4,1fr); }
+          .dash-tiles-6    { grid-template-columns:repeat(4,1fr); }
         }
 
         /* ════════════════════════
@@ -344,6 +346,7 @@ export default function DashboardPage() {
           .dash-att-pct    { font-size:24px; }
           .dash-tiles-3    { grid-template-columns:repeat(3,1fr); gap:8px; }
           .dash-tiles-5    { grid-template-columns:repeat(3,1fr); gap:8px; }
+          .dash-tiles-6    { grid-template-columns:repeat(3,1fr); gap:8px; }
           .dash-tiles-2    { grid-template-columns:repeat(2,1fr); gap:8px; }
           .dash-tile-link  { padding:10px 4px; gap:5px; border-radius:11px; }
           .dash-tile-label { font-size:8.5px; }
@@ -362,6 +365,7 @@ export default function DashboardPage() {
           .dash-stat-val   { font-size:18px; }
           .dash-tiles-3    { grid-template-columns:repeat(3,1fr); gap:6px; }
           .dash-tiles-5    { grid-template-columns:repeat(3,1fr); gap:6px; }
+          .dash-tiles-6    { grid-template-columns:repeat(3,1fr); gap:6px; }
           .dash-tile-link  { padding:9px 3px; border-radius:10px; }
           .dash-tile-label { font-size:8px; }
         }
@@ -594,7 +598,8 @@ export default function DashboardPage() {
             {TILE_SECTIONS.map((section, sIdx) => {
               const gridClass =
                 section.tiles.length <= 2 ? "dash-tiles-2" :
-                section.tiles.length <= 3 ? "dash-tiles-3" : "dash-tiles-5";
+                section.tiles.length <= 3 ? "dash-tiles-3" :
+                section.tiles.length <= 5 ? "dash-tiles-5" : "dash-tiles-6";
               return (
                 <motion.div
                   key={section.title}

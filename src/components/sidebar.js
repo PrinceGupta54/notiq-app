@@ -13,6 +13,7 @@ import {
   PlayCircle, MessageCircle, Trophy, FileText,
   BookOpen, Bell,ClipboardList, Award, Building2, LogOut,
   GraduationCap, X, User,
+  CalendarDays,
 } from "lucide-react";
 
 const NAV = [
@@ -46,6 +47,7 @@ const NAV = [
       { label: "Notices", href: "/notices", icon: Bell     },
       { label: "Syllabus", href: "/syllabus", icon: FileText },
       { label: "Pyq", href: "/pyq", icon: ClipboardList },
+      { label: "Holidays", href: "/holidays", icon: CalendarDays },
 
     ],
   },
