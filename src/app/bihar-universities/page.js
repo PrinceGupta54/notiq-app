@@ -7,14 +7,14 @@ import AppShell from "@/components/AppShell";
 import { ExternalLink, Search, MapPin, ChevronRight, Sparkles } from "lucide-react";
 
 const UNIVERSITIES = [
-  { name: "Bihar Engineering University (BEU)", location: "Patna", url: "https://beu.ac.in", type: "Technical" },
+  { name: "Bihar Engineering University (BEU)", location: "Patna", url: "https://beu-bih.ac.in", type: "Technical" },
   { name: "Aryabhatta Knowledge University (AKU)", location: "Patna", url: "https://www.akubihar.ac.in", type: "General" },
-  { name: "Patna University (PU)", location: "Patna", url: "https://www.patnauniversity.ac.in", type: "General" },
+  { name: "Patna University (PU)", location: "Patna", url: "https://pup.ac.in", type: "General" },
   { name: "Magadh University (MU)", location: "Bodh Gaya", url: "https://magadhuniversity.ac.in", type: "General" },
   { name: "B.R. Ambedkar Bihar University (BRABU)", location: "Muzaffarpur", url: "https://brabu.net", type: "General" },
   { name: "Lalit Narayan Mithila University (LNMU)", location: "Darbhanga", url: "https://lnmu.ac.in", type: "General" },
-  { name: "Tilka Manjhi Bhagalpur University (TMBU)", location: "Bhagalpur", url: "https://tmbu.ac.in", type: "General" },
-  { name: "Jai Prakash University (JPU)", location: "Chapra", url: "https://jpv.bih.nic.in", type: "General" },
+  { name: "Tilka Manjhi Bhagalpur University (TMBU)", location: "Bhagalpur", url: "https://www.tmbuniv.ac.in", type: "General" },
+  { name: "Jai Prakash University (JPU)", location: "Chapra", url: "https://www.jpv.ac.in", type: "General" },
   { name: "Bhupendra Narayan Mandal University (BNMU)", location: "Madhepura", url: "https://bnmu.ac.in", type: "General" },
   { name: "Veer Kunwar Singh University (VKSU)", location: "Ara", url: "https://vksu.ac.in", type: "General" },
   { name: "Munger University", location: "Munger", url: "https://mungeruniversity.ac.in", type: "General" },
