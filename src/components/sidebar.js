@@ -7,12 +7,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import {
   LayoutDashboard, CheckSquare, Calculator, Timer,
   PlayCircle, MessageCircle, Trophy, FileText,
-  BookOpen, Bell,ClipboardList, Award, Building2, LogOut,
-  GraduationCap, X, User,
+  BookOpen, Bell, ClipboardList, Award, Building2, LogOut,
+  GraduationCap, X, User, Pencil,
   CalendarDays,
 } from "lucide-react";
 
@@ -58,6 +59,13 @@ const NAV = [
       { label: "Universities", href: "/bihar-universities",  icon: Building2 },
     ],
   },
+  /* ── NEW: Account section, houses Edit Profile ── */
+  {
+    section: "Account",
+    items: [
+      { label: "Edit Profile", href: "/profile/edit", icon: User },
+    ],
+  },
 ];
 
 export default function Sidebar({ onClose }) {
@@ -65,17 +73,24 @@ export default function Sidebar({ onClose }) {
   const router    = useRouter();
   const [profile, setProfile]   = useState(null);
   const [hovered, setHovered]   = useState(null);
+  const [cardHov, setCardHov]   = useState(false); // NEW: hover state for the profile card
 
   useEffect(() => {
     const loadProfile = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
+      // FIXED: select avatar_url (matches the profiles table schema) instead of photo_url,
+      // and pull email from the auth session instead of a non-existent profiles.email column
       const { data } = await supabase
         .from("profiles")
-        .select("full_name, email, photo_url")
+        .select("full_name, avatar_url")
         .eq("id", session.user.id)
         .single();
-      setProfile(data);
+      setProfile({
+        full_name: data?.full_name || "",
+        avatar_url: data?.avatar_url || "",
+        email: session.user.email || "",
+      });
     };
     loadProfile();
   }, []);
@@ -116,6 +131,8 @@ export default function Sidebar({ onClose }) {
       marginBottom: 1,
     };
   };
+
+  const onEditProfilePage = isActive("/profile/edit");
 
   return (
     <div
@@ -243,26 +260,39 @@ export default function Sidebar({ onClose }) {
         }}
       >
         {profile && (
-          <div
+          /* NEW: card is now a clickable Link to /profile/edit, with hover glow + Edit pencil */
+          <Link
+            href="/profile/edit"
+            onClick={onClose}
+            onMouseEnter={() => setCardHov(true)}
+            onMouseLeave={() => setCardHov(false)}
             style={{
               display: "flex",
               alignItems: "center",
               gap: 10,
               padding: "10px 10px",
               borderRadius: 11,
-              background: "rgba(124,58,237,.1)",
-              border: "1px solid rgba(124,58,237,.2)",
+              background: onEditProfilePage
+                ? "rgba(124,58,237,.22)"
+                : cardHov
+                ? "rgba(124,58,237,.18)"
+                : "rgba(124,58,237,.1)",
+              border: `1px solid ${
+                onEditProfilePage
+                  ? "rgba(124,58,237,.5)"
+                  : cardHov
+                  ? "rgba(124,58,237,.4)"
+                  : "rgba(124,58,237,.2)"
+              }`,
+              boxShadow: cardHov || onEditProfilePage
+                ? "0 0 18px rgba(124,58,237,.25)"
+                : "none",
               marginBottom: 6,
-              transition: "all .2s",
-              cursor: "default",
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.background = "rgba(124,58,237,.16)";
-              e.currentTarget.style.borderColor = "rgba(124,58,237,.35)";
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.background = "rgba(124,58,237,.1)";
-              e.currentTarget.style.borderColor = "rgba(124,58,237,.2)";
+              transition: "all .22s cubic-bezier(.34,1.2,.64,1)",
+              cursor: "pointer",
+              textDecoration: "none",
+              position: "relative",
+              overflow: "hidden",
             }}
           >
             {/* Avatar */}
@@ -270,21 +300,23 @@ export default function Sidebar({ onClose }) {
               style={{
                 width: 34, height: 34,
                 borderRadius: 10,
-                background: "linear-gradient(135deg,#7c3aed,#5b21b6)",
-                boxShadow: "0 0 12px rgba(124,58,237,.45)",
+                /* FIXED: only ever set backgroundImage, never the "background" shorthand,
+                   so this never collides with the gradient fallback across renders */
+                backgroundImage: profile.avatar_url
+                  ? `url(${profile.avatar_url})`
+                  : "linear-gradient(135deg,#7c3aed,#5b21b6)",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                boxShadow: cardHov
+                  ? "0 0 18px rgba(124,58,237,.6)"
+                  : "0 0 12px rgba(124,58,237,.45)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 flexShrink: 0,
-                overflow: "hidden",
+                transition: "box-shadow .22s",
               }}
             >
-              {profile.photo_url ? (
-                <img
-                  src={profile.photo_url}
-                  alt="avatar"
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
+              {!profile.avatar_url && (
                 <span style={{ color: "#fff", fontSize: 14, fontWeight: 700 }}>
                   {profile.full_name?.charAt(0)?.toUpperCase() || "S"}
                 </span>
@@ -300,7 +332,22 @@ export default function Sidebar({ onClose }) {
                 {profile.email}
               </p>
             </div>
-          </div>
+
+            {/* NEW: Edit pencil icon, fades in on hover */}
+            <motion.div
+              animate={{ opacity: cardHov || onEditProfilePage ? 1 : 0, x: cardHov || onEditProfilePage ? 0 : 4 }}
+              transition={{ duration: 0.18 }}
+              style={{
+                flexShrink: 0,
+                width: 22, height: 22, borderRadius: 7,
+                background: "rgba(124,58,237,.25)",
+                border: "1px solid rgba(124,58,237,.4)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}
+            >
+              <Pencil size={10} style={{ color: "#c4b5fd" }} />
+            </motion.div>
+          </Link>
         )}
 
         {/* Logout */}

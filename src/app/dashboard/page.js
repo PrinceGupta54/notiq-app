@@ -1,4 +1,4 @@
-// src/app/dashboard/page.js — FULLY RESPONSIVE VERSION
+// src/app/dashboard/page.js — FULLY RESPONSIVE VERSION + EDIT PROFILE CARD
 // Paste this ENTIRE file into src/app/dashboard/page.js
 
 "use client";
@@ -14,7 +14,7 @@ import {
   MessageCircle, Trophy, FileText, BookOpen,
   Bell, Award, Building2, Plus, Trash2,
   TrendingUp, Zap, Target, ArrowUpRight, Layers,
-  ClipboardList, Palmtree,
+  ClipboardList, Palmtree, User, Pencil, Sparkles,
 } from "lucide-react";
 
 /* ─── helpers ─── */
@@ -107,11 +107,16 @@ const UNIVERSITY = [
   { label:"Results",      href:"/results",            icon:Award,     color:"#86efac", glow:"134,239,172" },
   { label:"Universities", href:"/bihar-universities",  icon:Building2, color:"#fcd34d", glow:"252,211,77"  },
 ];
+/* ── NEW: Account section, houses Edit Profile tile ── */
+const ACCOUNT = [
+  { label:"Edit Profile", href:"/profile/edit", icon:User, color:"#c4b5fd", glow:"167,139,250" },
+];
 const TILE_SECTIONS = [
   { title:"STUDY TOOLS", tiles:STUDY_TOOLS, accentGlow:"124,58,237"  },
   { title:"LEARN",       tiles:LEARN,       accentGlow:"252,211,77"  },
   { title:"RESOURCES",   tiles:RESOURCES,   accentGlow:"103,232,249" },
   { title:"UNIVERSITY",  tiles:UNIVERSITY,  accentGlow:"134,239,172" },
+  { title:"ACCOUNT",     tiles:ACCOUNT,     accentGlow:"167,139,250" }, /* NEW */
 ];
 
 /* ─── Tile component ─── */
@@ -194,6 +199,152 @@ const glass = {
   borderRadius  : 18,
   backdropFilter: "blur(12px)",
 };
+
+/* ─── NEW: Edit Profile featured card ───────────────────────
+   Sits right under the greeting — a premium, glowing entry
+   point into the profile editor with avatar preview & CTA. */
+function EditProfileCard({ profile, router }) {
+  const [hov, setHov] = useState(false);
+  const fullName  = profile?.full_name || "";
+  const avatarUrl = profile?.avatar_url || "";
+  const college   = profile?.college || profile?.university?.toUpperCase() || "";
+  const branch    = profile?.branch || "";
+
+  return (
+    <motion.div
+      initial={{ opacity:0, y:18 }}
+      animate={{ opacity:1, y:0  }}
+      transition={{ delay:0.18, duration:0.45, ease:[0.22,1,.36,1] }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      onClick={() => router.push("/profile/edit")}
+      style={{
+        ...glass,
+        position    : "relative",
+        overflow    : "hidden",
+        padding     : "18px 20px",
+        marginBottom: 20,
+        cursor      : "pointer",
+        display     : "flex",
+        alignItems  : "center",
+        gap         : 16,
+        borderColor : hov ? "rgba(167,139,250,.4)" : "rgba(255,255,255,.08)",
+        boxShadow   : hov
+          ? "0 16px 36px rgba(124,58,237,.22), 0 0 0 1px rgba(167,139,250,.25)"
+          : "0 2px 12px rgba(0,0,0,.25)",
+        transform   : hov ? "translateY(-3px)" : "translateY(0)",
+        transition  : "all .25s cubic-bezier(.34,1.2,.64,1)",
+      }}
+    >
+      {/* Ambient glow orb that drifts on hover */}
+      <motion.div
+        animate={{
+          opacity: hov ? 1 : 0.45,
+          scale  : hov ? 1.15 : 1,
+        }}
+        transition={{ duration:0.4 }}
+        style={{
+          position:"absolute", top:-40, right:-40,
+          width:160, height:160, borderRadius:"50%",
+          background:"radial-gradient(circle,rgba(124,58,237,.28),transparent 70%)",
+          pointerEvents:"none",
+        }}
+      />
+
+      {/* Sweeping shimmer line on hover */}
+      {hov && (
+        <motion.div
+          initial={{ x:"-100%" }}
+          animate={{ x:"200%" }}
+          transition={{ duration:1.1, ease:"easeInOut" }}
+          style={{
+            position:"absolute", top:0, bottom:0, width:"40%",
+            background:"linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent)",
+            pointerEvents:"none",
+          }}
+        />
+      )}
+
+      {/* Avatar */}
+      <motion.div
+        animate={{ scale: hov ? 1.06 : 1 }}
+        transition={{ duration:0.25 }}
+        style={{
+          width:54, height:54, borderRadius:"50%", flexShrink:0, position:"relative",
+          background: avatarUrl
+            ? `url(${avatarUrl}) center/cover no-repeat`
+            : "radial-gradient(circle at 35% 30%, #c4b5fd, #7c3aed)",
+          display:"flex", alignItems:"center", justifyContent:"center",
+          boxShadow: hov
+            ? "0 0 0 3px rgba(124,58,237,.25), 0 0 26px rgba(124,58,237,.4)"
+            : "0 0 0 2px rgba(124,58,237,.15), 0 0 16px rgba(124,58,237,.2)",
+          transition:"box-shadow .25s",
+        }}
+      >
+        {!avatarUrl && (
+          <span style={{ fontSize:20, fontWeight:900, color:"#fff" }}>
+            {fullName ? fullName[0].toUpperCase() : <User size={22} />}
+          </span>
+        )}
+      </motion.div>
+
+      {/* Info */}
+      <div style={{ flex:1, minWidth:0, position:"relative", zIndex:1 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:3 }}>
+          <p style={{
+            fontSize:15, fontWeight:700, color:"#fff",
+            whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis",
+          }}>
+            {fullName || "Complete your profile"}
+          </p>
+          {(!fullName || !branch) && (
+            <motion.span
+              animate={{ opacity:[1,.5,1] }}
+              transition={{ duration:1.8, repeat:Infinity }}
+              style={{
+                display:"flex", alignItems:"center", gap:3,
+                fontSize:9.5, fontWeight:700, color:"#fbbf24",
+                background:"rgba(251,191,36,.12)", border:"1px solid rgba(251,191,36,.3)",
+                borderRadius:20, padding:"2px 8px", flexShrink:0,
+              }}
+            >
+              <Sparkles size={9} /> Setup
+            </motion.span>
+          )}
+        </div>
+        <p style={{
+          fontSize:12, color:"rgba(255,255,255,.4)",
+          whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis",
+        }}>
+          {branch || college
+            ? `${branch ? branch : ""}${branch && college ? " · " : ""}${college || ""}`
+            : "Add your college, branch & semester"}
+        </p>
+      </div>
+
+      {/* Edit pill button */}
+      <motion.div
+        animate={{
+          background: hov ? "rgba(124,58,237,.22)" : "rgba(124,58,237,.12)",
+          borderColor: hov ? "rgba(124,58,237,.5)" : "rgba(124,58,237,.25)",
+        }}
+        style={{
+          display:"flex", alignItems:"center", gap:6, flexShrink:0,
+          padding:"8px 14px", borderRadius:10,
+          border:"1px solid rgba(124,58,237,.25)",
+          position:"relative", zIndex:1,
+          boxShadow: hov ? "0 0 16px rgba(124,58,237,.3)" : "none",
+          transition:"box-shadow .25s",
+        }}
+      >
+        <Pencil size={12} style={{ color:"#c4b5fd" }} />
+        <span style={{ fontSize:12, fontWeight:600, color:"#c4b5fd", whiteSpace:"nowrap" }}>
+          Edit
+        </span>
+      </motion.div>
+    </motion.div>
+  );
+}
 
 /* ══════════════════════════════════════
    MAIN COMPONENT
@@ -314,6 +465,7 @@ export default function DashboardPage() {
         .dash-tiles-5  { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
         .dash-tiles-6  { display:grid; grid-template-columns:repeat(6,1fr); gap:10px; }
         .dash-tiles-2  { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+        .dash-tiles-1  { display:grid; grid-template-columns:repeat(1,1fr); gap:10px; max-width:220px; }
 
         /* ── Quick access box ── */
         .dash-qa-box { padding:24px 24px 20px; }
@@ -348,6 +500,7 @@ export default function DashboardPage() {
           .dash-tiles-5    { grid-template-columns:repeat(3,1fr); gap:8px; }
           .dash-tiles-6    { grid-template-columns:repeat(3,1fr); gap:8px; }
           .dash-tiles-2    { grid-template-columns:repeat(2,1fr); gap:8px; }
+          .dash-tiles-1    { max-width:180px; }
           .dash-tile-link  { padding:10px 4px; gap:5px; border-radius:11px; }
           .dash-tile-label { font-size:8.5px; }
           .dash-qa-box     { padding:16px 14px 14px; }
@@ -366,6 +519,7 @@ export default function DashboardPage() {
           .dash-tiles-3    { grid-template-columns:repeat(3,1fr); gap:6px; }
           .dash-tiles-5    { grid-template-columns:repeat(3,1fr); gap:6px; }
           .dash-tiles-6    { grid-template-columns:repeat(3,1fr); gap:6px; }
+          .dash-tiles-1    { max-width:160px; }
           .dash-tile-link  { padding:9px 3px; border-radius:10px; }
           .dash-tile-label { font-size:8px; }
         }
@@ -378,13 +532,16 @@ export default function DashboardPage() {
           initial={{ opacity:0, y:-16 }}
           animate={{ opacity:1, y:0   }}
           transition={{ duration:0.5, ease:[0.22,1,0.36,1] }}
-          style={{ marginBottom:28 }}
+          style={{ marginBottom:20 }}
         >
           <h1 className="dash-greeting">{getGreeting()}, {firstName} 👋</h1>
           <p style={{ fontSize:13, color:"rgba(255,255,255,.32)", letterSpacing:".01em" }}>
             {formatDate()}
           </p>
         </motion.div>
+
+        {/* ══ NEW: EDIT PROFILE FEATURED CARD ══ */}
+        <EditProfileCard profile={profile} router={router} />
 
         {/* ══ STAT CARDS ══ */}
         <div className="dash-stats-grid">
@@ -584,7 +741,7 @@ export default function DashboardPage() {
           </motion.div>
         </div>
 
-        {/* ══ QUICK ACCESS — 4 SECTIONED GROUPS ══ */}
+        {/* ══ QUICK ACCESS — 5 SECTIONED GROUPS (incl. new ACCOUNT) ══ */}
         <motion.div
           initial={{ opacity:0, y:20 }}
           animate={{ opacity:1, y:0  }}
@@ -597,6 +754,7 @@ export default function DashboardPage() {
           <div className="dash-section-gap" style={{ display:"flex", flexDirection:"column" }}>
             {TILE_SECTIONS.map((section, sIdx) => {
               const gridClass =
+                section.tiles.length <= 1 ? "dash-tiles-1" :
                 section.tiles.length <= 2 ? "dash-tiles-2" :
                 section.tiles.length <= 3 ? "dash-tiles-3" :
                 section.tiles.length <= 5 ? "dash-tiles-5" : "dash-tiles-6";
